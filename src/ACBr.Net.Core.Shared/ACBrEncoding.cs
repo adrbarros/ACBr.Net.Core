@@ -1,14 +1,14 @@
 // ***********************************************************************
 // Assembly         : ACBr.Net.Core
 // Author           : RFTD
-// Created          : 04-19-2014
+// Created          : 05-08-2017
 //
 // Last Modified By : RFTD
-// Last Modified On : 08-30-2015
+// Last Modified On : 05-08-2017
 // ***********************************************************************
-// <copyright file="AssemblyExtenssions.cs" company="ACBr.Net">
+// <copyright file="ACBrEncoding.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Grupo ACBr.Net
+//	     		    Copyright (c) 2014 - 2017 Grupo ACBr.Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -29,30 +29,42 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Drawing;
-using System.IO;
+using System.Text;
 
-namespace ACBr.Net.Core.Extensions
+namespace ACBr.Net.Core
 {
-	/// <summary>
-	/// Class ByteExtensions.
-	/// </summary>
-	public static partial class ByteExtensions
-	{
-		/// <summary>
-		/// To the image.
-		/// </summary>
-		/// <param name="byteArrayIn">The byte array in.</param>
-		/// <returns>Image.</returns>
-		public static Image ToImage(this byte[] byteArrayIn)
-		{
-			if (byteArrayIn == null) return null;
+    /// <summary>
+    /// Classe com enconding para facilitar o uso.
+    /// </summary>
+    public static class ACBrEncoding
+    {
+        #region Properties
 
-			using (var ms = new MemoryStream(byteArrayIn))
-			{
-				var returnImage = Image.FromStream(ms);
-				return returnImage;
-			}
-		}
-	}
+        /// <summary>
+        /// Retorna o enconding ISO-8859-1
+        /// </summary>
+        public static Encoding ISO88591 => Encoding.GetEncoding("ISO-8859-1");
+
+        /// <summary>
+        /// Retorna o enconding IBM850
+        /// </summary>
+        public static Encoding IBM850 => Encoding.GetEncoding("IBM850");
+
+        /// <summary>
+        /// Retorna o enconding IBM860
+        /// </summary>
+        public static Encoding IBM860 => Encoding.GetEncoding("IBM860");
+
+        /// <summary>
+        /// Retorna o enconding CP1252
+        /// </summary>
+        public static Encoding CP1252 => Windows1252;
+
+        /// <summary>
+        /// Retorna o enconding Windows-1252
+        /// </summary>
+        public static Encoding Windows1252 => Encoding.GetEncoding("Windows-1252");
+
+        #endregion Properties
+    }
 }

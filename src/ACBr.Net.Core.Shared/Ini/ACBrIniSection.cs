@@ -1,12 +1,12 @@
 // ***********************************************************************
-// Assembly         : ACBr.Net.Core
+// Assembly         : ACBr.Net.ECF
 // Author           : RFTD
-// Created          : 04-19-2014
+// Created          : 04-05-2017
 //
 // Last Modified By : RFTD
-// Last Modified On : 08-30-2015
+// Last Modified On : 04-05-2017
 // ***********************************************************************
-// <copyright file="AssemblyExtenssions.cs" company="ACBr.Net">
+// <copyright file="ACBrIniSection.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Grupo ACBr.Net
 //
@@ -29,30 +29,43 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Drawing;
-using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using ACBr.Net.Core.Extensions;
 
-namespace ACBr.Net.Core.Extensions
+namespace ACBr.Net.Core
 {
-	/// <summary>
-	/// Class ByteExtensions.
-	/// </summary>
-	public static partial class ByteExtensions
-	{
-		/// <summary>
-		/// To the image.
-		/// </summary>
-		/// <param name="byteArrayIn">The byte array in.</param>
-		/// <returns>Image.</returns>
-		public static Image ToImage(this byte[] byteArrayIn)
-		{
-			if (byteArrayIn == null) return null;
+    public sealed class ACBrIniSection : Dictionary<string, string>
+    {
+        #region Properties
 
-			using (var ms = new MemoryStream(byteArrayIn))
-			{
-				var returnImage = Image.FromStream(ms);
-				return returnImage;
-			}
-		}
-	}
+        public string Name { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
+        public TType GetValue<TType>(string key, TType defaultValue = default(TType), IFormatProvider format = null)
+        {
+            if (key.IsEmpty()) return defaultValue;
+
+            TType ret;
+            try
+            {
+                if (format == null) format = CultureInfo.InvariantCulture;
+                if (!ContainsKey(key)) return defaultValue;
+
+                ret = (TType)Convert.ChangeType(this[key], typeof(TType), format);
+            }
+            catch (Exception)
+            {
+                ret = defaultValue;
+            }
+
+            return ret;
+        }
+
+        #endregion Methods
+    }
 }

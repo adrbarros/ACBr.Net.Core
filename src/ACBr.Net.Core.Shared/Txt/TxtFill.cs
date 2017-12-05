@@ -1,14 +1,14 @@
 // ***********************************************************************
 // Assembly         : ACBr.Net.Core
 // Author           : RFTD
-// Created          : 04-19-2014
+// Created          : 04-06-2017
 //
 // Last Modified By : RFTD
-// Last Modified On : 08-30-2015
+// Last Modified On : 04-06-2017
 // ***********************************************************************
-// <copyright file="AssemblyExtenssions.cs" company="ACBr.Net">
+// <copyright file="TxtFill.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Grupo ACBr.Net
+//	     		    Copyright (c) 2014 - 2017 Grupo ACBr.Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -29,30 +29,11 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Drawing;
-using System.IO;
-
-namespace ACBr.Net.Core.Extensions
+namespace ACBr.Net.Core
 {
-	/// <summary>
-	/// Class ByteExtensions.
-	/// </summary>
-	public static partial class ByteExtensions
+	public enum TxtFill
 	{
-		/// <summary>
-		/// To the image.
-		/// </summary>
-		/// <param name="byteArrayIn">The byte array in.</param>
-		/// <returns>Image.</returns>
-		public static Image ToImage(this byte[] byteArrayIn)
-		{
-			if (byteArrayIn == null) return null;
-
-			using (var ms = new MemoryStream(byteArrayIn))
-			{
-				var returnImage = Image.FromStream(ms);
-				return returnImage;
-			}
-		}
+		Esquerda,
+		Direta
 	}
 }

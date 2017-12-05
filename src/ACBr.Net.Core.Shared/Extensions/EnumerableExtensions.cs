@@ -1,12 +1,12 @@
 // ***********************************************************************
 // Assembly         : ACBr.Net.Core
 // Author           : RFTD
-// Created          : 04-19-2014
+// Created          : 03-21-2014
 //
 // Last Modified By : RFTD
 // Last Modified On : 08-30-2015
 // ***********************************************************************
-// <copyright file="AssemblyExtenssions.cs" company="ACBr.Net">
+// <copyright file="DecimalExtensions.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Grupo ACBr.Net
 //
@@ -29,30 +29,57 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Drawing;
-using System.IO;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace ACBr.Net.Core.Extensions
 {
 	/// <summary>
-	/// Class ByteExtensions.
+	/// Class EnumerableExtensions.
 	/// </summary>
-	public static partial class ByteExtensions
+	public static class EnumerableExtensions
 	{
 		/// <summary>
-		/// To the image.
+		/// Transforma uma lista em uma BindingList.
 		/// </summary>
-		/// <param name="byteArrayIn">The byte array in.</param>
-		/// <returns>Image.</returns>
-		public static Image ToImage(this byte[] byteArrayIn)
+		/// <typeparam name="T"></typeparam>
+		/// <param name="list">A lista</param>
+		/// <returns>BindingList</returns>
+		public static BindingList<T> ToBindingList<T>(this IEnumerable<T> list)
 		{
-			if (byteArrayIn == null) return null;
+			var ret = new BindingList<T>();
 
-			using (var ms = new MemoryStream(byteArrayIn))
+			foreach (var item in list)
 			{
-				var returnImage = Image.FromStream(ms);
-				return returnImage;
+				ret.Add(item);
 			}
+
+			return ret;
+		}
+
+		/// <summary>
+		/// Transforma uma lista de string em uma unica string.
+		/// </summary>
+		/// <param name="array">The array.</param>
+		/// <returns>String com todos os dados da lista de strings</returns>
+		public static string AsString(this IEnumerable<string> array)
+		{
+			return string.Join(Environment.NewLine, array);
+		}
+
+		/// <summary>
+		/// Faz cast de um ienumerable para outro tipo
+		/// </summary>
+		/// <param name="lista"></param>
+		/// <param name="tipo"></param>
+		/// <returns></returns>
+		public static IEnumerable Cast(this IEnumerable lista, Type tipo)
+		{
+			var method = typeof(Enumerable).GetMethod("Cast").MakeGenericMethod(tipo);
+			return (IEnumerable)method.Invoke(null, new object[] { lista });
 		}
 	}
 }

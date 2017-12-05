@@ -1,14 +1,14 @@
 // ***********************************************************************
 // Assembly         : ACBr.Net.Core
 // Author           : RFTD
-// Created          : 07-30-2016
+// Created          : 04-06-2017
 //
 // Last Modified By : RFTD
-// Last Modified On : 07-30-2016
+// Last Modified On : 04-06-2017
 // ***********************************************************************
-// <copyright file="ACBrStringWriter.cs" company="ACBr.Net">
+// <copyright file="TxtInfo.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Grupo ACBr.Net
+//	     		    Copyright (c) 2014 - 2017 Grupo ACBr.Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -29,26 +29,17 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.IO;
-using System.Text;
-
 namespace ACBr.Net.Core
 {
-	public sealed class ACBrStringWriter : StringWriter
+	public enum TxtInfo
 	{
-		#region Constructors
-
-		public ACBrStringWriter(Encoding encoding)
-		{
-			Encoding = encoding;
-		}
-
-		#endregion Constructors
-
-		#region Propriedades
-
-		public override Encoding Encoding { get; }
-
-		#endregion Propriedades
+		Str,
+		StrNumber,
+		Int,
+		Enum,
+		Date,
+		Time,
+		MothYear,
+		Number
 	}
 }

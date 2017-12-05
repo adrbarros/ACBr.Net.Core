@@ -4,7 +4,7 @@
 // Created          : 01-31-2016
 //
 // Last Modified By : RFTD
-// Last Modified On : 05-15-2016
+// Last Modified On : 04-21-2017
 // ***********************************************************************
 // <copyright file="StringExtensions.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
@@ -36,7 +36,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
 
 namespace ACBr.Net.Core.Extensions
 {
@@ -532,8 +531,7 @@ namespace ACBr.Net.Core.Extensions
 		/// </summary>
 		/// <param name="toNormalize">String para processar.</param>
 		/// <returns>System.String.</returns>
-		/// <exception cref="System.Exception">Erro ao processar a string</exception>
-		/// <exception cref="Exception">Erro ao processar a string</exception>
+		/// <exception cref="ACBrException">Erro ao processar a string</exception>
 		public static string OnlyNumbers(this string toNormalize)
 		{
 			try
@@ -542,6 +540,27 @@ namespace ACBr.Net.Core.Extensions
 
 				var toReturn = Regex.Replace(toNormalize, "[^0-9]", string.Empty);
 				return toReturn;
+			}
+			catch (Exception ex)
+			{
+				throw new ACBrException("Erro ao processar a string", ex);
+			}
+		}
+
+		/// <summary>
+		/// Remove pontuações, espaços e traços de uma string, deixando apenas Dígitos e Letras
+		/// </summary>
+		/// <param name="str">String para processar.</param>
+		/// <returns>System.String.</returns>
+		/// <exception cref="ACBrException">Erro ao processar a string</exception>
+		public static string RemoveMask(this string str)
+		{
+			try
+			{
+				if (str.IsEmpty()) return str;
+
+				var digitsOnlyRegex = new Regex(@"[^\w]");
+				return digitsOnlyRegex.Replace(str, string.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -734,14 +753,9 @@ namespace ACBr.Net.Core.Extensions
 		{
 			try
 			{
-				if (pInscr.IsEmpty())
-					return false;
-
-				if (pInscr.Trim().ToUpper() == "ISENTO")
-					return true;
-
-				if (!pUf.ValidarUF() || pUf.ToUpper() == "EX")
-					return false;
+				if (pInscr.IsEmpty()) return false;
+				if (pInscr.Trim().ToUpper() == "ISENTO") return true;
+				if (!pUf.ValidarUF() || pUf.ToUpper() == "EX") return false;
 
 				const string c09 = "0-9";
 				int[,] cPesos =
@@ -817,7 +831,7 @@ namespace ACBr.Net.Core.Extensions
 							xRot = "CE";
 							vDigitos = new[] { "DVX", c09, c09, c09, c09, c09, c09, "3", "0", "", "", "", "", "" };
 
-							if (fsDocto.ToInt64().Between(30170010, 30190229))
+							if (fsDocto.ToInt64().IsBetween(30170010, 30190229))
 								fatorF = 1;
 							else if (fsDocto.ToInt64() >= 30190230)
 								xRot = "E";
@@ -875,7 +889,7 @@ namespace ACBr.Net.Core.Extensions
 							tamanho = 9;
 							vDigitos = new[] { "DVX", c09, c09, c09, c09, c09, c09, "0,1,5", "1", "", "", "", "", "" };
 
-							if (fsDocto.ToInt64().Between(101031050, 101199979))
+							if (fsDocto.ToInt64().IsBetween(101031050, 101199979))
 								fatorG = 1;
 						}
 						break;
@@ -1092,7 +1106,7 @@ namespace ACBr.Net.Core.Extensions
 							}
 							else if (vDigitos[I].Contains('-'))
 							{
-								ok = d.ToInt32().Between(vDigitos[I].Substring(0, 1).ToInt32(), vDigitos[I].Substring(2, 1).ToInt32());
+								ok = d.ToInt32().IsBetween(vDigitos[I].Substring(0, 1).ToInt32(), vDigitos[I].Substring(2, 1).ToInt32());
 							}
 							else
 							{
@@ -1384,33 +1398,6 @@ namespace ACBr.Net.Core.Extensions
 		}
 
 		/// <summary>
-		/// To the XML string.
-		/// </summary>
-		/// <param name="value">The text.</param>
-		/// <returns>System.String.</returns>
-		/// <exception cref="System.Exception">Erro ao codificar string</exception>
-		public static string ToXmlString(this string value)
-		{
-			try
-			{
-				if (value.IsEmpty()) return string.Empty;
-
-				var bytes = Encoding.Default.GetBytes(value);
-				var text = RemoveAccent(Encoding.UTF8.GetString(bytes));
-
-				var textOut = new StringBuilder();
-				foreach (var current in text.Where(XmlConvert.IsXmlChar))
-					textOut.Append(current);
-
-				return textOut.ToString();
-			}
-			catch (Exception ex)
-			{
-				throw new ACBrException("Erro ao codificar string", ex);
-			}
-		}
-
-		/// <summary>
 		/// Transforma um array de string em uma unica string.
 		/// </summary>
 		/// <param name="array">The array.</param>
@@ -1505,21 +1492,21 @@ namespace ACBr.Net.Core.Extensions
 		/// <returns>String sem carateres especiais e normalizada</returns>
 		public static string RemoveAccent(this string value)
 		{
-			if (value.IsEmpty()) return string.Empty;
+			if (value.IsEmpty()) return value;
 
-			var retorno = value.ReplaceAny(new[] { 'á', 'à', 'â', 'ã', 'ª' }, 'a');
-			retorno = retorno.ReplaceAny(new[] { 'Á', 'À', 'Â', 'Ã', 'Ä' }, 'A');
-			retorno = retorno.ReplaceAny(new[] { 'é', 'è', 'ê', 'ë' }, 'e');
-			retorno = retorno.ReplaceAny(new[] { 'É', 'È', 'Ê', 'Ë' }, 'E');
-			retorno = retorno.ReplaceAny(new[] { 'í', 'ì', 'î' }, 'i');
-			retorno = retorno.ReplaceAny(new[] { 'Í', 'Ì', 'Î' }, 'I');
-			retorno = retorno.ReplaceAny(new[] { 'ó', 'ò', 'ô', 'õ', 'ö', 'º' }, 'o');
-			retorno = retorno.ReplaceAny(new[] { 'Ó', 'Ò', 'Ô', 'Õ', 'Ö' }, 'O');
-			retorno = retorno.ReplaceAny(new[] { 'ú', 'ù', 'û', 'ü' }, 'u');
-			retorno = retorno.ReplaceAny(new[] { 'Ú', 'Ù', 'Û', 'Ü' }, 'U');
-			retorno = retorno.ReplaceAny(new[] { 'Ç' }, 'C');
-			retorno = retorno.ReplaceAny(new[] { 'ç' }, 'c');
-			return retorno;
+			value = Regex.Replace(value, "[áàâãª]", "a");
+			value = Regex.Replace(value, "[ÁÀÂÃÄ]", "A");
+			value = Regex.Replace(value, "[éèêë]", "e");
+			value = Regex.Replace(value, "[ÉÈÊË]", "E");
+			value = Regex.Replace(value, "[íìîï]", "i");
+			value = Regex.Replace(value, "[ÍÌÎÏ]", "I");
+			value = Regex.Replace(value, "[óòôõöº]", "o");
+			value = Regex.Replace(value, "[ÓÒÔÕÖ]", "O");
+			value = Regex.Replace(value, "[úùûü]", "u");
+			value = Regex.Replace(value, "[ÚÙÛÜ]", "U");
+			value = Regex.Replace(value, "[Ç]", "C");
+			value = Regex.Replace(value, "[ç]", "c");
+			return value;
 		}
 
 		/// <summary>
@@ -1680,9 +1667,9 @@ namespace ACBr.Net.Core.Extensions
 
 				return agenciaConta;
 			}
-			catch
+			catch (Exception exception)
 			{
-				return string.Empty;
+				throw new ACBrException("Erro ao formatar agencia conta", exception);
 			}
 		}
 
@@ -1759,7 +1746,7 @@ namespace ACBr.Net.Core.Extensions
 		/// <returns>System.String.</returns>
 		public static string Before(this string value, int end)
 		{
-			return end == 0 ? string.Empty : value.Between(0, end - 1);
+			return end < 1 ? string.Empty : value.GetStrBetween(0, end - 1);
 		}
 
 		/// <summary>
@@ -1770,7 +1757,7 @@ namespace ACBr.Net.Core.Extensions
 		/// <returns>System.String.</returns>
 		public static string After(this string value, int start)
 		{
-			return value.Between(start + 1, int.MaxValue);
+			return value.GetStrBetween(start + 1, int.MaxValue);
 		}
 
 		/// <summary>
@@ -1780,7 +1767,7 @@ namespace ACBr.Net.Core.Extensions
 		/// <param name="start">The start.</param>
 		/// <param name="end">The end.</param>
 		/// <returns>System.String.</returns>
-		public static string Between(this string value, int start, int end)
+		public static string GetStrBetween(this string value, int start, int end)
 		{
 			if (value.IsEmpty()) return string.Empty;
 
@@ -1809,6 +1796,45 @@ namespace ACBr.Net.Core.Extensions
 			}
 
 			return value.Substring(start, end - start + 1);
+		}
+
+		/// <summary>
+		/// Get string value after [first] a.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <param name="before">The string inicio.</param>
+		public static string Before(this string value, string before)
+		{
+			var posA = value.IndexOf(before);
+			return posA == -1 ? string.Empty : value.Substring(0, posA);
+		}
+
+		/// <summary>
+		/// Get string value after [last] a.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <param name="after">The string inicio.</param>
+		public static string After(this string value, string after)
+		{
+			var posA = value.LastIndexOf(after);
+			if (posA == -1) return string.Empty;
+
+			var adjustedPosA = posA + after.Length;
+			return adjustedPosA >= value.Length ? string.Empty : value.Substring(adjustedPosA);
+		}
+
+		/// <summary>
+		/// Retorna a string que esta entre as duas string informadas.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <param name="strInicio">The string inicio.</param>
+		/// <param name="strFinal">The string final.</param>
+		/// <returns>System.String.</returns>
+		public static string GetStrBetween(this string value, string strInicio, string strFinal)
+		{
+			return Regex.Match(value, Regex.Replace(strInicio, @"[][{}()*+?.\\^$|]", @"\$0") + @"\s*(((?!" +
+				Regex.Replace(strInicio, @"[][{}()*+?.\\^$|]", @"\$0") + @"|" + Regex.Replace(strFinal, @"[][{}()*+?.\\^$|]", @"\$0") + @").)+)\s*" +
+				Regex.Replace(strFinal, @"[][{}()*+?.\\^$|]", @"\$0"), RegexOptions.IgnoreCase).Value.Replace(strInicio, "").Replace(strFinal, "");
 		}
 
 		/// <summary>
@@ -1877,27 +1903,6 @@ namespace ACBr.Net.Core.Extensions
 		public static string RemoveDoubleSpaces(this string value)
 		{
 			return Regex.Replace(value, "[ ]{2,}", " ", RegexOptions.None);
-		}
-
-		/// <summary>
-		/// Retorna a string que esta entre as duas string informadas.
-		/// </summary>
-		/// <param name="value">The value.</param>
-		/// <param name="strInicio">The string inicio.</param>
-		/// <param name="strFinal">The string final.</param>
-		/// <returns>System.String.</returns>
-		public static string StringEntreString(this string value, string strInicio, string strFinal)
-		{
-			var ini = value.IndexOf(strInicio, StringComparison.Ordinal);
-			var fim = value.IndexOf(strFinal, StringComparison.Ordinal);
-
-			if (ini > 0) ini = ini + strInicio.Length;
-			if (fim > 0) fim = fim + strFinal.Length;
-			var diff = fim - ini - strFinal.Length;
-
-			if (fim > ini && diff > 0) return value.Substring(ini, diff);
-
-			return string.Empty;
 		}
 
 		#endregion Methods

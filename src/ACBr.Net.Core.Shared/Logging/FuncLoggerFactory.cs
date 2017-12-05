@@ -1,12 +1,12 @@
 // ***********************************************************************
 // Assembly         : ACBr.Net.Core
 // Author           : RFTD
-// Created          : 04-19-2014
+// Created          : 06-06-2016
 //
 // Last Modified By : RFTD
-// Last Modified On : 08-30-2015
+// Last Modified On : 06-06-2016
 // ***********************************************************************
-// <copyright file="AssemblyExtenssions.cs" company="ACBr.Net">
+// <copyright file="FuncLogManager.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Grupo ACBr.Net
 //
@@ -29,30 +29,57 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Drawing;
-using System.IO;
+using System;
 
-namespace ACBr.Net.Core.Extensions
+namespace ACBr.Net.Core.Logging
 {
 	/// <summary>
-	/// Class ByteExtensions.
+	///
 	/// </summary>
-	public static partial class ByteExtensions
+	public class FuncLoggerFactory : ILoggerFactory
 	{
-		/// <summary>
-		/// To the image.
-		/// </summary>
-		/// <param name="byteArrayIn">The byte array in.</param>
-		/// <returns>Image.</returns>
-		public static Image ToImage(this byte[] byteArrayIn)
-		{
-			if (byteArrayIn == null) return null;
+		#region Fields
 
-			using (var ms = new MemoryStream(byteArrayIn))
-			{
-				var returnImage = Image.FromStream(ms);
-				return returnImage;
-			}
+		private readonly Func<Type, IACBrLogger> loggerByType;
+		private readonly Func<string, IACBrLogger> loggerByKey;
+
+		#endregion Fields
+
+		#region Constructors
+
+		/// <summary>
+		///
+		/// </summary>
+		/// <param name="getLoggerType"></param>
+		/// <param name="getLoggerKey"></param>
+		public FuncLoggerFactory(Func<Type, IACBrLogger> getLoggerType, Func<string, IACBrLogger> getLoggerKey = null)
+		{
+			loggerByType = getLoggerType;
+			loggerByKey = getLoggerKey;
 		}
+
+		/// <summary>
+		///
+		/// </summary>
+		/// <param name="getLogger"></param>
+		public FuncLoggerFactory(Func<string, IACBrLogger> getLogger) : this(null, getLogger)
+		{
+		}
+
+		#endregion Constructors
+
+		#region Methods
+
+		public IACBrLogger LoggerFor(string keyName)
+		{
+			return loggerByKey?.Invoke(keyName);
+		}
+
+		public IACBrLogger LoggerFor(Type type)
+		{
+			return loggerByType?.Invoke(type);
+		}
+
+		#endregion Methods
 	}
 }

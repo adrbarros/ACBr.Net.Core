@@ -1,14 +1,14 @@
 // ***********************************************************************
-// Assembly         : ACBr.Net.Core
+// Assembly         : ACBr.Net.SPED.Core
 // Author           : RFTD
-// Created          : 04-19-2014
+// Created          : 04-06-2017
 //
 // Last Modified By : RFTD
-// Last Modified On : 08-30-2015
+// Last Modified On : 04-06-2017
 // ***********************************************************************
-// <copyright file="AssemblyExtenssions.cs" company="ACBr.Net">
+// <copyright file="TxtEnumAttribute.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Grupo ACBr.Net
+//	     		    Copyright (c) 2014 - 2017 Grupo ACBr.Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -29,30 +29,26 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Drawing;
-using System.IO;
+using System;
 
-namespace ACBr.Net.Core.Extensions
+namespace ACBr.Net.Core
 {
-	/// <summary>
-	/// Class ByteExtensions.
-	/// </summary>
-	public static partial class ByteExtensions
+	[AttributeUsage(AttributeTargets.Field)]
+	public sealed class TxtEnumAttribute : Attribute
 	{
 		/// <summary>
-		/// To the image.
+		/// Initializes a new instance of the <see cref="TxtEnumAttribute"/> class.
 		/// </summary>
-		/// <param name="byteArrayIn">The byte array in.</param>
-		/// <returns>Image.</returns>
-		public static Image ToImage(this byte[] byteArrayIn)
+		/// <param name="value">The value.</param>
+		public TxtEnumAttribute(string value)
 		{
-			if (byteArrayIn == null) return null;
-
-			using (var ms = new MemoryStream(byteArrayIn))
-			{
-				var returnImage = Image.FromStream(ms);
-				return returnImage;
-			}
+			Value = value;
 		}
+
+		/// <summary>
+		/// Gets or sets the value.
+		/// </summary>
+		/// <value>The value.</value>
+		public string Value { get; set; }
 	}
 }

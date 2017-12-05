@@ -1,12 +1,12 @@
 // ***********************************************************************
 // Assembly         : ACBr.Net.Core
 // Author           : RFTD
-// Created          : 04-19-2014
+// Created          : 07-30-2016
 //
 // Last Modified By : RFTD
-// Last Modified On : 08-30-2015
+// Last Modified On : 07-30-2016
 // ***********************************************************************
-// <copyright file="AssemblyExtenssions.cs" company="ACBr.Net">
+// <copyright file="ACBrStringWriter.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Grupo ACBr.Net
 //
@@ -29,30 +29,44 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Drawing;
 using System.IO;
+using System.Text;
 
-namespace ACBr.Net.Core.Extensions
+namespace ACBr.Net.Core
 {
 	/// <summary>
-	/// Class ByteExtensions.
+	/// Classe derivada da StringWriter que aceita a mudança de encond.
 	/// </summary>
-	public static partial class ByteExtensions
+	public sealed class ACBrStringWriter : StringWriter
 	{
-		/// <summary>
-		/// To the image.
-		/// </summary>
-		/// <param name="byteArrayIn">The byte array in.</param>
-		/// <returns>Image.</returns>
-		public static Image ToImage(this byte[] byteArrayIn)
-		{
-			if (byteArrayIn == null) return null;
+		#region Constructors
 
-			using (var ms = new MemoryStream(byteArrayIn))
-			{
-				var returnImage = Image.FromStream(ms);
-				return returnImage;
-			}
+		/// <summary>
+		/// Inicializar uma nova instancida da classe <see cref="ACBrStringWriter" />.
+		/// </summary>
+		public ACBrStringWriter()
+		{
+			Encoding = Encoding.UTF8;
 		}
+
+		/// <summary>
+		/// Inicializar uma nova instancida da classe <see cref="ACBrStringWriter" />.
+		/// </summary>
+		/// <param name="encoding"></param>
+		public ACBrStringWriter(Encoding encoding)
+		{
+			Encoding = encoding;
+		}
+
+		#endregion Constructors
+
+		#region Propriedades
+
+		/// <summary>Gets the <see cref="T:System.Text.Encoding" /> in which the output is written.</summary>
+		/// <returns>The Encoding in which the output is written.</returns>
+		/// <filterpriority>1</filterpriority>
+		public override Encoding Encoding { get; }
+
+		#endregion Propriedades
 	}
 }

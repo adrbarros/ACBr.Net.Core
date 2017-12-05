@@ -1,12 +1,12 @@
 // ***********************************************************************
 // Assembly         : ACBr.Net.Core
 // Author           : RFTD
-// Created          : 03-21-2014
+// Created          : 01-06-2015
 //
 // Last Modified By : RFTD
-// Last Modified On : 08-30-2015
+// Last Modified On : 24-03-2016
 // ***********************************************************************
-// <copyright file="DecimalExtensions.cs" company="ACBr.Net">
+// <copyright file="GenericClone.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Grupo ACBr.Net
 //
@@ -30,42 +30,42 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
-namespace ACBr.Net.Core.Extensions
+namespace ACBr.Net.Core.Generics
 {
 	/// <summary>
-	/// Class EnumerableExtensions.
+	/// Classe GenericClone implementação generica da interface ICloneable.
 	/// </summary>
-	public static class EnumerableExtensions
+	/// <typeparam name="T"></typeparam>
+	public class GenericClone<T> : ICloneable where T : class
 	{
 		/// <summary>
-		/// Transforma uma lista em uma BindingList.
+		/// Cria um novo objeto que é uma copia da instancia atual.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="list">A lista</param>
-		/// <returns>BindingList</returns>
-		public static BindingList<T> ToBindingList<T>(this IEnumerable<T> list)
+		/// <returns>T.</returns>
+		public T Clone()
 		{
-			var ret = new BindingList<T>();
-
-			foreach (var item in list)
+			using (var ms = new MemoryStream())
 			{
-				ret.Add(item);
-			}
+				var bf = new BinaryFormatter();
+				bf.Serialize(ms, this);
+				ms.Position = 0;
 
-			return ret;
+				var obj = bf.Deserialize(ms);
+
+				return obj as T;
+			}
 		}
 
 		/// <summary>
-		/// Transforma uma lista de string em uma unica string.
+		/// Cria um novo objeto que é uma copia da instancia atual.
 		/// </summary>
-		/// <param name="array">The array.</param>
-		/// <returns>String com todos os dados da lista de strings</returns>
-		public static string AsString(this IEnumerable<string> array)
+		/// <returns>A new object that is a copy of this instance.</returns>
+		object ICloneable.Clone()
 		{
-			return string.Join(Environment.NewLine, array);
+			return Clone();
 		}
 	}
 }
