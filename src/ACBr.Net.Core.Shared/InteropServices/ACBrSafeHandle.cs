@@ -143,9 +143,9 @@ namespace ACBr.Net.Core.InteropServices
 
             #region Properties
 
-            private static readonly bool IsWindows;
+            public static readonly bool IsWindows;
 
-            private static readonly bool IsOSX;
+            public static readonly bool IsOSX;
 
             #endregion Properties
 
@@ -188,6 +188,7 @@ namespace ACBr.Net.Core.InteropServices
         #region Fields
 
         protected readonly Dictionary<Type, string> methodList;
+        protected readonly Dictionary<string, Delegate> methodCache;
         protected readonly string className;
 
         #endregion Fields
@@ -204,6 +205,7 @@ namespace ACBr.Net.Core.InteropServices
             : base(IntPtr.Zero, true)
         {
             methodList = new Dictionary<Type, string>();
+            methodCache = new Dictionary<string, Delegate>();
             className = GetType().Name;
 
             var pNewSession = LibLoader.LoadLibrary(dllPath);
@@ -233,6 +235,12 @@ namespace ACBr.Net.Core.InteropServices
                 return true;
             }
         }
+
+        public static bool IsWindows => LibLoader.IsWindows;
+
+        public static bool IsOSX => LibLoader.IsOSX;
+
+        public static bool IsLinux => !LibLoader.IsOSX && LibLoader.IsWindows;
 
         #endregion Properties
 
@@ -275,6 +283,7 @@ namespace ACBr.Net.Core.InteropServices
 
             var method = methodList[typeof(T)];
             this.Log().Debug($"{className} : Acessando o método [{method}] da biblioteca.");
+            if (methodCache.ContainsKey("method")) return methodCache[method] as T;
 
             var mHandler = LibLoader.GetProcAddress(handle, method);
 
@@ -283,6 +292,7 @@ namespace ACBr.Net.Core.InteropServices
             var methodHandler = LibLoader.LoadFunction<T>(mHandler);
             this.Log().Debug($"{className} : Método [{method}] carregado.");
 
+            methodCache.Add(method, methodHandler as Delegate);
             return methodHandler;
         }
 
@@ -299,6 +309,19 @@ namespace ACBr.Net.Core.InteropServices
             try
             {
                 return method();
+            }
+            catch (Exception exception)
+            {
+                throw ProcessException(exception);
+            }
+        }
+
+        [HandleProcessCorruptedStateExceptions]
+        protected virtual void ExecuteMethod(Action method)
+        {
+            try
+            {
+                method();
             }
             catch (Exception exception)
             {
